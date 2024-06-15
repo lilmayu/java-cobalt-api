@@ -29,19 +29,13 @@ var context = DownloadContext.builder("https://www.youtube.com/watch?v=dQw4w9WgX
 var result = api.getDownload(context).send();
 
 // Check if the result is an error
-if(result.
+if (result.isError()) {
+    System.out.println("Error: " + result.getText());
+    return;
+}
 
-isError()){
-        System.out.
-
-println("Error: "+result.getText());
-        return;
-        }
-
-        // Print the stream URL
-        System.out.
-
-println("Stream URL is: "+result.getUrl());
+// Print the stream URL
+System.out.println("Stream URL is: " + result.getUrl());
 ```
 
 Result:
