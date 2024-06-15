@@ -78,14 +78,14 @@ dependencies {
 
         <!-- Required for the library to work -->
 <dependency>
-<groupId>dev.mayuna</groupId>
-<artifactId>simple-java-api-wrapper</artifactId>
-<version>2.3.1</version>
+    <groupId>dev.mayuna</groupId>
+    <artifactId>simple-java-api-wrapper</artifactId>
+    <version>2.3.1</version>
 </dependency>
 <dependency>
-<groupId>com.google.code.gson</groupId>
-<artifactId>gson</artifactId>
-<version>2.11.0</version>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.11.0</version>
 </dependency>
 ```
 
