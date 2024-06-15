@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     // Simple JAva API Wrapper
-    implementation 'dev.mayuna:simple-java-api-wrapper:2.3'
+    implementation 'dev.mayuna:simple-java-api-wrapper:2.3.1'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.+'
@@ -40,7 +40,7 @@ dependencies {
 // Java 11
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
