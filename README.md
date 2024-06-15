@@ -76,7 +76,7 @@ dependencies {
     <version>1.0.0</version>
 </dependency>
 
-        <!-- Required for the library to work -->
+<!-- Required for the library to work -->
 <dependency>
     <groupId>dev.mayuna</groupId>
     <artifactId>simple-java-api-wrapper</artifactId>
