@@ -1,0 +1,152 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'signing'
+    id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id 'jacoco'
+    id 'jacoco-report-aggregation'
+}
+
+group = 'dev.mayuna'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url 'https://s01.oss.sonatype.org/content/repositories/releases'
+    }
+}
+
+dependencies {
+    // Simple JAva API Wrapper
+    implementation 'dev.mayuna:simple-java-api-wrapper:2.3'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.+'
+    annotationProcessor 'org.projectlombok:lombok:1.18.+'
+    testCompileOnly 'org.projectlombok:lombok:1.18.+'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.+'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // GSON
+    api 'com.google.code.gson:gson:2.11.0'
+}
+
+// Java 11
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        csv.required = true
+    }
+}
+
+// == Quick tasks == //
+
+task publishCloseAndRelease() {
+    dependsOn 'publishToSonatype'
+    dependsOn 'closeAndReleaseSonatypeStagingRepository'
+}
+
+shadowJar {
+
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+// == Maven publishing == //
+
+publishing {
+
+    publications {
+        shadow(MavenPublication) {
+            groupId = 'dev.mayuna'
+            artifactId = 'java-cobalt-api'
+            version = getVersion()
+            from components.java
+
+            pom {
+                name = 'java-cobalt-api'
+                description = 'Java Cobalt API wrapper'
+                url = 'https://github.com/lilmayu/java-cobalt-api'
+
+                scm {
+                    connection = 'scm:https://github.com/lilmayu/java-cobalt-api'
+                    developerConnection = 'scm:git:https://github.com/lilmayu/java-cobalt-api.git'
+                    url = 'https://github.com/lilmayu/java-cobalt-api'
+                }
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/license/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'mayuna'
+                        name = 'Marek Lof'
+                        email = 'uwulilmayu@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+
+    publishing {
+        repositories {
+            maven {
+                credentials {
+                    username = project.properties['ossrhUsername'] ?: System.getenv('ossrhUsername')
+                    password = project.properties['ossrhPassword'] ?: System.getenv('ossrhPassword')
+                }
+
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications.shadow
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username = project.properties['ossrhUsername'] ?: System.getenv('ossrhUsername')
+            password = project.properties['ossrhPassword'] ?: System.getenv('ossrhPassword')
+        }
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+shadowJar.dependsOn javadocJar
+shadowJar.dependsOn sourcesJar
+shadowJar.dependsOn jar
+
+components.java.withVariantsFromConfiguration(configurations.shadowRuntimeElements) {
+    skip()
+}
